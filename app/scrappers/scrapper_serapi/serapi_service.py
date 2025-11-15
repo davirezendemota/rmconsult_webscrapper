@@ -10,7 +10,7 @@ class SerApiService:
         self.repo = SerApiRepository()
 
     def buscar(self, termo: str):
-        empresas, meta = serapi_scraper.buscar(termo)
+        empresas, meta = serapi_scraper.buscar_empresas(termo)
         used, limit = update_credit_usage(termo)
 
         self.repo.save_log(termo, len(empresas), meta)
@@ -24,7 +24,7 @@ class SerApiService:
         }
 
     def buscar_excel(self, termo: str):
-        empresas, meta = serapi_scraper.buscar(termo)
+        empresas, meta = serapi_scraper.buscar_empresas(termo)
         arquivo = excel_formatter.gerar_excel(empresas, termo)
 
         return {

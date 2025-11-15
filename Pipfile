@@ -24,5 +24,14 @@ black = "*"
 isort = "*"
 flake8 = "*"
 
+[scripts]
+
+dev = "uvicorn main:app --reload --port 8005 --env-file .env"
+prod = "uvicorn main:app --host 0.0.0.0 --port 8005"
+
+format = "black . && isort ."
+lint = "flake8 ."
+test = "pytest -s"
+
 [requires]
 python_version = "3.12"

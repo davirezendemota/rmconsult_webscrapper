@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-class GoogleMapsRequestDTO(BaseModel):
+class SerApiBuscarDTO(BaseModel):
     termo: str
 
 
