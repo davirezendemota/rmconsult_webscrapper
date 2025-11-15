@@ -75,7 +75,6 @@ rmconsult_scrappers/
 ```
 
 - A pasta `scrapper_serapi` representa **uma família de scrapers** (SerpAPI Google Maps).
-- Futuramente, você pode criar irmãs como `scrapper_googleplaces/`, `scrapper_instagram/` etc.
 
 ---
 
