@@ -4,28 +4,15 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [packages]
-# --- Backend principal ---
+
 fastapi = "*"
 uvicorn = { extras = ["standard"], version = "*" }
-
-# --- Dependências do Scraper ---
 requests = "*"
 python-dotenv = "*"
 google-search-results = "*"   # serpapi SDK
-
-# --- Excel / Data ---
 pandas = "*"
 openpyxl = "*"
-
-# --- Dependências auxiliares usadas no projeto ---
 numpy = "*"
-
-# --- Flet Desktop (opcional) ---
-flet = "*"
-flet-cli = "*"
-flet-desktop = "*"
-
-# --- Utilidades geralmente presentes no requirements ---
 certifi = "*"
 charset-normalizer = "*"
 idna = "*"
