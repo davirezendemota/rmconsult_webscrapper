@@ -1,0 +1,28 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[packages]
+fastapi = "*"
+uvicorn = { extras = ["standard"], version = "*" }
+pydantic = "*"
+requests = "*"
+pandas = "*"
+openpyxl = "*"
+python-dotenv = "*"
+# Caso use seu buscar_empresas.py com BeautifulSoup ou afins:
+beautifulsoup4 = "*"
+lxml = "*"
+
+# Se você usa SerpAPI oficial:
+google-search-results = "*"
+
+[dev-packages]
+pytest = "*"
+black = "*"
+isort = "*"
+flake8 = "*"
+
+[requires]
+python_version = "3.12"

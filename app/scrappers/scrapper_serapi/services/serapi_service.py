@@ -1,0 +1,34 @@
+from credits import update_credit_usage
+from app.scrappers.scrapper_serapi.scrapper import serapi_scraper
+from app.scrappers.scrapper_serapi.utils import excel_formatter
+from app.scrappers.scrapper_serapi.repositories.serapi_repository import SerApiRepository
+
+
+class SerApiService:
+
+    def __init__(self):
+        self.repo = SerApiRepository()
+
+    def buscar(self, termo: str):
+        empresas, meta = serapi_scraper.buscar(termo)
+        used, limit = update_credit_usage(termo)
+
+        self.repo.save_log(termo, len(empresas), meta)
+
+        return {
+            "termo": termo,
+            "quantidade": len(empresas),
+            "meta": meta,
+            "credits": {"used": used, "limit": limit},
+            "empresas": empresas
+        }
+
+    def buscar_excel(self, termo: str):
+        empresas, meta = serapi_scraper.buscar(termo)
+        arquivo = excel_formatter.gerar_excel(empresas, termo)
+
+        return {
+            "termo": termo,
+            "quantidade": len(empresas),
+            "arquivo": arquivo
+        }
