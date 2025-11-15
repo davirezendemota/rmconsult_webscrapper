@@ -1,5 +1,5 @@
 from serpapi import GoogleSearch
-from app.core.config import settings
+from app.core.config import env
 
 
 class SerApiScraper:
@@ -10,7 +10,7 @@ class SerApiScraper:
             "engine": "google_maps",
             "q": termo,
             "hl": "pt-br",
-            "api_key": settings.SERPAPI_KEY,
+            "api_key": env.SERPAPI_KEY,
         }
 
         search = GoogleSearch(params)

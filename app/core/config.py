@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-class Settings:
+class Env:
     SERPAPI_KEY = os.getenv("SERPAPI_KEY")
 
-settings = Settings()
+env = Env()
