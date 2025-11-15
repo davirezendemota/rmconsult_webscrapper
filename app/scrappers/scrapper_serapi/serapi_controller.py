@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends
-from app.scrappers.scrapper_serapi.dtos import scrapper_serapi_dto
-from app.scrappers.scrapper_serapi.services import serapi_service
+from app.scrappers.scrapper_serapi import scrapper_serapi_dto
+from app.scrappers.scrapper_serapi import serapi_service
 
-router = APIRouter(tags=["Google Maps"])
+router = APIRouter(tags=["SerAPI Google Maps"])
 
 
 @router.post("/buscar")

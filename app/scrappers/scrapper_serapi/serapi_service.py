@@ -1,7 +1,7 @@
-from credits import update_credit_usage
-from app.scrappers.scrapper_serapi.scrapper import serapi_scraper
+from app.scrappers.scrapper_serapi.utils.credits import update_credit_usage
+from app.scrappers.scrapper_serapi import serapi_scraper
 from app.scrappers.scrapper_serapi.utils import excel_formatter
-from app.scrappers.scrapper_serapi.repositories.serapi_repository import SerApiRepository
+from app.scrappers.scrapper_serapi.serapi_repository import SerApiRepository
 
 
 class SerApiService:
