@@ -11,11 +11,9 @@ requests = "*"
 pandas = "*"
 openpyxl = "*"
 python-dotenv = "*"
-# Caso use seu buscar_empresas.py com BeautifulSoup ou afins:
 beautifulsoup4 = "*"
 lxml = "*"
 
-# Se você usa SerpAPI oficial:
 google-search-results = "*"
 
 [dev-packages]
