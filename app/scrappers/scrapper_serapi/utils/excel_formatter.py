@@ -57,9 +57,9 @@ class ExcelFormatter:
         nome_limpo = nome_limpo.replace(" ", "_")
 
         filename = f"{nome_limpo}_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S-%f')}.xlsx"
-        filepath = f"resultados/{filename}"
+        filepath = f"storage/resultados/{filename}"
 
-        os.makedirs("resultados", exist_ok=True)
+        os.makedirs("storage/resultados", exist_ok=True)
         df.to_excel(filepath, index=False)
 
         wb = load_workbook(filepath)

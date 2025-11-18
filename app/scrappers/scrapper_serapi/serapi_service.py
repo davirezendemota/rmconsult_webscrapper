@@ -1,6 +1,6 @@
 from app.scrappers.scrapper_serapi.utils.credits import update_credit_usage
 from app.scrappers.scrapper_serapi.serapi_scraper import SerApiScraper
-from app.scrappers.scrapper_serapi.utils import excel_formatter
+from app.scrappers.scrapper_serapi.utils.excel_formatter import ExcelFormatter
 from app.scrappers.scrapper_serapi.serapi_repository import SerApiRepository
 
 
@@ -36,7 +36,7 @@ class SerApiService:
         empresas, meta = SerApiScraper.buscar_api(termo)
 
         # Gera excel
-        arquivo = excel_formatter.gerar_excel(empresas, termo)
+        arquivo = ExcelFormatter.gerar_excel(empresas, termo)
 
         return {
             "termo": termo,
