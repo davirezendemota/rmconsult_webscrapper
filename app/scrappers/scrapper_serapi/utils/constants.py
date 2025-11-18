@@ -25,3 +25,4 @@ RENOMEAR_COLUNAS = {
     "unsupported_extensions": "Atributos Não Suportados",
     "service_options": "Opções de Serviço",
 }
+

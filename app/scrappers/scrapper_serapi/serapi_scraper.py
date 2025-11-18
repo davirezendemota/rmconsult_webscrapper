@@ -5,7 +5,7 @@ from app.core.config import env
 class SerApiScraper:
 
     @staticmethod
-    def buscar(termo: str):
+    def buscar_api(termo: str):
         params = {
             "engine": "google_maps",
             "q": termo,
@@ -16,7 +16,7 @@ class SerApiScraper:
         search = GoogleSearch(params)
         results = search.get_dict()
 
-        local_results = results.get("local_results", [])
+        empresas = results.get("local_results", [])
         meta = results.get("search_metadata", {})
 
-        return local_results, meta
+        return empresas, meta
