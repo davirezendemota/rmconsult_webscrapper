@@ -1,5 +1,9 @@
 from fastapi import FastAPI
 from app.routers import register_routes
+from app.core.logger import setup_logging
+
+# Inicializar sistema de logging (envia logs para stdout/stderr para Docker)
+setup_logging()
 
 app = FastAPI(
     title="RM CONSULT – Scrappers",
