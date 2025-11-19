@@ -1,4 +1,4 @@
-import os
+import io
 import pandas as pd
 import unicodedata
 from datetime import datetime
@@ -13,12 +13,12 @@ from app.scrappers.scrapper_serapi.utils.constants import RENOMEAR_COLUNAS
 class ExcelFormatter:
 
     @staticmethod
-    def gerar_excel(empresas, termo_busca):
+    def gerar_excel_memoria(empresas, termo_busca):
 
+        # Coletar colunas
         todas_chaves = set()
         for emp in empresas:
-            for k in emp.keys():
-                todas_chaves.add(k)
+            todas_chaves.update(emp.keys())
 
         todas_chaves = list(todas_chaves)
 
@@ -43,7 +43,6 @@ class ExcelFormatter:
                 elif isinstance(valor, list):
                     valor = ", ".join(str(v) for v in valor)
                 linha[chave] = valor
-
             linhas.append(linha)
 
         df = pd.DataFrame(linhas, columns=ordem_final)
@@ -53,17 +52,15 @@ class ExcelFormatter:
             for chave in ordem_final
         }, inplace=True)
 
-        nome_limpo = unicodedata.normalize("NFKD", termo_busca).encode("ASCII", "ignore").decode()
-        nome_limpo = nome_limpo.replace(" ", "_")
+        # Criar arquivo em memória
+        stream = io.BytesIO()
+        df.to_excel(stream, index=False, engine="openpyxl")
+        stream.seek(0)
 
-        filename = f"{nome_limpo}_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S-%f')}.xlsx"
-        filepath = f"storage/resultados/{filename}"
-
-        os.makedirs("storage/resultados", exist_ok=True)
-        df.to_excel(filepath, index=False)
-
-        wb = load_workbook(filepath)
+        # Reabrir workbook para estilização
+        wb = load_workbook(stream)
         ws = wb.active
+
         ws.freeze_panes = "A2"
 
         header_fill = PatternFill(start_color="1F4E78", end_color="1F4E78", fill_type="solid")
@@ -103,6 +100,9 @@ class ExcelFormatter:
         table.tableStyleInfo = TableStyleInfo(name="TableStyleMedium2", showRowStripes=True)
         ws.add_table(table)
 
-        wb.save(filepath)
+        # Salvar no mesmo stream
+        stream = io.BytesIO()
+        wb.save(stream)
+        stream.seek(0)
 
-        return filepath
+        return stream

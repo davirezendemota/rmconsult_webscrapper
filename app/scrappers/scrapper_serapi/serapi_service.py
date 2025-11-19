@@ -1,6 +1,7 @@
 from datetime import datetime
-from app.scrappers.scrapper_serapi.mapper_serapi import map_serapi_to_company_info
-from app.scrappers.scrapper_serapi.utils.credits import update_credit_usage
+
+from fastapi.responses import StreamingResponse
+from app.scrappers.scrapper_serapi.utils.mapper_serapi import map_serapi_to_company_info
 from app.scrappers.scrapper_serapi.serapi_scraper import SerApiScraper
 from app.scrappers.scrapper_serapi.utils.excel_formatter import ExcelFormatter
 from app.scrappers.scrapper_serapi.serapi_repository import SerApiRepository
@@ -26,15 +27,15 @@ class SerApiService:
         }
 
     def buscar_excel(self, termo: str):
-        # Busca empresas
         empresas, meta = SerApiScraper.buscar_api(termo)
 
-        # Gera excel
-        arquivo = ExcelFormatter.gerar_excel(empresas, termo)
+        excel_stream = ExcelFormatter.gerar_excel_memoria(empresas, termo)
 
-        return {
-            "termo": termo,
-            "quantidade": len(empresas),
-            "arquivo": arquivo,
-            "meta": meta,
-        }
+        nome_limpo = termo.replace(" ", "_").lower()
+        filename = f"{nome_limpo}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+
+        return StreamingResponse(
+            excel_stream,
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            headers={"Content-Disposition": f"attachment; filename={filename}"}
+        )
