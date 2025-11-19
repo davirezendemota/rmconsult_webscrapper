@@ -14,7 +14,7 @@ class SerApiService:
         empresas, meta = SerApiScraper.buscar_api(termo)
 
         # Atualiza créditos
-        used, limit = update_credit_usage(termo)
+        # used, limit = update_credit_usage(termo)
 
         # Salva log
         # self.repo.save_log(
@@ -27,7 +27,7 @@ class SerApiService:
             "termo": termo,
             "quantidade": len(empresas),
             "meta": meta,
-            "credits": {"used": used, "limit": limit},
+            # "credits": {"used": used, "limit": limit},
             "empresas": empresas
         }
 
