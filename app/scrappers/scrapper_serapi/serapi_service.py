@@ -1,3 +1,5 @@
+from datetime import datetime
+from app.scrappers.scrapper_serapi.mapper_serapi import map_serapi_to_company_info
 from app.scrappers.scrapper_serapi.utils.credits import update_credit_usage
 from app.scrappers.scrapper_serapi.serapi_scraper import SerApiScraper
 from app.scrappers.scrapper_serapi.utils.excel_formatter import ExcelFormatter
@@ -13,22 +15,14 @@ class SerApiService:
         # Executa o scraper
         empresas, meta = SerApiScraper.buscar_api(termo)
 
-        # Atualiza créditos
-        # used, limit = update_credit_usage(termo)
-
-        # Salva log
-        # self.repo.save_log(
-        #     termo_busca=termo,
-        #     quantidade=len(empresas),
-        #     meta=meta
-        # )
+        empresas_mapeadas = [map_serapi_to_company_info(e).model_dump() for e in empresas]
 
         return {
-            "termo": termo,
-            "quantidade": len(empresas),
+            "status": "ok",
+            "termo_busca": termo,
+            "quantidade": len(empresas_mapeadas),
             "meta": meta,
-            # "credits": {"used": used, "limit": limit},
-            "empresas": empresas
+            "empresas": empresas_mapeadas,
         }
 
     def buscar_excel(self, termo: str):
