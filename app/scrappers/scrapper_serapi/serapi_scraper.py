@@ -8,50 +8,57 @@ class SerApiScraper:
     @staticmethod
     def buscar_api(termo: str):
         """
-        Busca empresas no Google Maps via SerpAPI.
-        Registra logs de cada consumo da API.
+        Executa busca usando um pool de chaves:
+        - Tenta cada chave em ordem
+        - Se der erro (403, limite, invalid key etc), tenta a próxima
+        - Se todas falharem, lança exceção
         """
-        params = {
-            "engine": "google_maps",
-            "q": termo,
-            "hl": "pt-br",
-            "api_key": env.SERPAPI_KEY,
-        }
 
-        # Log: Início da chamada à SerpAPI
-        serpapi_logger.info(
-            f"SerpAPI: Iniciando busca - termo='{termo}', engine='google_maps'"
-        )
+        keys = env.SERPAPI_KEYS_LIST
 
-        try:
-            search = GoogleSearch(params)
-            results = search.get_dict()
+        if not keys:
+            raise RuntimeError("Nenhuma chave configurada em SERPAPI_KEYS")
 
-            empresas = results.get("local_results", [])
-            meta = results.get("search_metadata", {})
+        last_error = None
 
-            # Extrair informações relevantes dos metadados
-            status = meta.get("status", "unknown")
-            total_results = len(empresas)
-            search_id = meta.get("id", "N/A")
-            created_at = meta.get("created_at", "N/A")
-
-            # Log: Sucesso na chamada
+        for index, key in enumerate(keys):
             serpapi_logger.info(
-                f"SerpAPI: Busca concluída com sucesso - "
-                f"termo='{termo}', "
-                f"status='{status}', "
-                f"total_resultados={total_results}, "
-                f"search_id='{search_id}', "
-                f"created_at='{created_at}'"
+                f"Tentando SerpAPI Key {index+1}/{len(keys)}…"
             )
 
-            return empresas, meta
+            params = {
+                "engine": "google_maps",
+                "q": termo,
+                "hl": "pt-br",
+                "api_key": key,
+            }
 
-        except Exception as e:
-            # Log: Erro na chamada
-            serpapi_logger.error(
-                f"SerpAPI: Erro ao buscar - termo='{termo}', "
-                f"erro='{str(e)}', tipo='{type(e).__name__}'"
-            )
-            raise
+            try:
+                search = GoogleSearch(params)
+                results = search.get_dict()
+
+                # Verifica erros típicos da SerpAPI
+                if "error" in results:
+                    raise Exception(results["error"])
+
+                empresas = results.get("local_results", [])
+                meta = results.get("search_metadata", {})
+
+                serpapi_logger.info(
+                    f"SerpAPI: sucesso com a key {index+1} | resultados={len(empresas)}"
+                )
+
+                return empresas, meta
+
+            except Exception as e:
+                serpapi_logger.error(
+                    f"SerpAPI Key {index+1} falhou: {str(e)}"
+                )
+                last_error = e
+                continue  # tenta próxima key
+
+        # Se chegou aqui, todas as keys falharam
+        raise RuntimeError(
+            f"Todas as chaves SerpAPI falharam ao buscar '{termo}'. "
+            f"Último erro: {str(last_error)}"
+        )
