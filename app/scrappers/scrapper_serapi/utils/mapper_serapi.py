@@ -13,15 +13,16 @@ def map_serapi_to_company_info(item: dict) -> CompanyInfoDTO:
 
     if address and "," in address:
         parts = [p.strip() for p in address.split(",")]
+        if len(parts) >= 1:
+            country = parts[-1]
         if len(parts) >= 2:
             neighborhood = parts[1]
+            zip_code = parts[-2]
         if len(parts) >= 3:
             city = parts[2].split("-")[0].strip()
         if len(parts) >= 3 and "-" in parts[2]:
             state = parts[2].split("-")[1].strip()
-
-        if len(parts) >= 4:
-            zip_code = parts[3].replace("Brasil", "").strip()
+            
 
     dto = CompanyInfoDTO(
         # Basic
@@ -36,7 +37,7 @@ def map_serapi_to_company_info(item: dict) -> CompanyInfoDTO:
         city=city,
         state=state,
         region=None,
-        country="Brasil",
+        country=country,
         zip_code=zip_code,
 
         # Contact
