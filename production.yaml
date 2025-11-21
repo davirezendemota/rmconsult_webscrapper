@@ -12,7 +12,6 @@ services:
   postgres:
     container_name: rmconsult_webscrapper-postgres
     image: postgres:18
-    user: "1000"
     restart: unless-stopped
     ports:
       - "10103:5432"
