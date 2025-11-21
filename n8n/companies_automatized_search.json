@@ -27,7 +27,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "http://72.60.144.82:10101/scraaper/serapi/buscar",
+        "url": "http://72.60.144.82:10102/scraper/serapi/buscar",
         "sendBody": true,
         "bodyParameters": {
           "parameters": [
@@ -66,9 +66,9 @@
     },
     {
       "parameters": {
-        "content": "Insert searched city and line of business IDs into searched_cities_lob",
+        "content": "Insert searched city and line of business IDs into searched_cities_lobs",
         "height": 96,
-        "width": 160
+        "width": 176
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
@@ -200,10 +200,10 @@
             "maps_category": "={{ $json.maps_category }}",
             "description": "={{ $json.description }}",
             "adress": "={{ $json.address }}",
-            "neighboorhood": "={{ $json.neighborhood }}",
-            "city": "={{ $json.city }}",
-            "state": "={{ $json.state }}",
-            "region": "={{ $json.region }}",
+            "neighboorhood": "=",
+            "city": "=",
+            "state": "=",
+            "region": "=",
             "country": "={{ $json.country }}",
             "zip_code": "={{ $json.zip_code }}",
             "phone_number": "={{ $json.phone_number }}",
@@ -216,8 +216,7 @@
             "price_range": "={{ $json.price_range }}",
             "data_scraping": "={{ $json.data_scraping }}",
             "source": "={{ $json.source }}",
-            "last_updated": "={{ $json.last_updated }}",
-            "id": 0
+            "last_updated": "={{ $json.last_updated }}"
           },
           "matchingColumns": [
             "id"
@@ -231,7 +230,7 @@
               "display": true,
               "type": "number",
               "canBeUsedToMatch": true,
-              "removed": false
+              "removed": true
             },
             {
               "id": "name",
@@ -467,7 +466,7 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.6,
       "position": [
-        816,
+        784,
         -16
       ],
       "id": "cb6c6327-6070-482e-9886-c3ddbdb4ec47",
@@ -482,7 +481,15 @@
     {
       "parameters": {
         "authentication": "webhook",
-        "options": {}
+        "options": {},
+        "embeds": {
+          "values": [
+            {
+              "inputMethod": "json",
+              "json": "={\n      \"title\": \"⛔ HTTP Request Error\",\n      \"description\": \"Request to company search API was unsuccessfull\",\n      \"color\": 16711680,\n      \"fields\": [\n        {\n          \"name\": \"Parameters\",\n          \"value\": \"{{ $json.city }} {{ $json.lob }}\"\n        },\n        {\n          \"name\": \"Error message\",\n          \"value\": \"{{ $json.error.status }} {{ $json.error.code }}\"\n        },\n        {\n          \"name\": \"Workflow\",\n          \"value\": \"[{{$workflow.name}}](https://n8n2.rmconsult.io/workflow/hd5DoKwgukBlsQ4U)\"\n        }\n      ],\n      \"footer\": {\n          \"text\": \"n8n Webhook\"\n      }\n    }"
+            }
+          ]
+        }
       },
       "type": "n8n-nodes-base.discord",
       "typeVersion": 2,
@@ -503,36 +510,32 @@
     {
       "parameters": {
         "authentication": "webhook",
-        "options": {}
+        "options": {},
+        "embeds": {
+          "values": [
+            {
+              "inputMethod": "json",
+              "json": "={\n      \"title\": \"✅ Companies Search Successfull\",\n      \"description\": \"{{ $('HTTP Request').item.json.quantidade }} searched and inserted into Postgres successfully!\",\n      \"color\": 3075839,\n      \"fields\": [\n        {\n          \"name\": \"Search term\",\n          \"value\": \"{{ $('HTTP Request').item.json.termo_busca }}\"\n        },\n        {\n          \"name\": \"Destination table\",\n          \"value\": \"*rm_consult_webscraper.company_info*\"\n        },\n        {\n          \"name\": \"Workflow\",\n          \"value\": \"[{{ $workflow.name }}](https://n8n2.rmconsult.io/workflow/hd5DoKwgukBlsQ4U)\"\n        }\n      ],\n      \"footer\": {\n          \"text\": \"n8n Webhook\"\n      }\n    }"
+            }
+          ]
+        }
       },
       "type": "n8n-nodes-base.discord",
       "typeVersion": 2,
       "position": [
-        1024,
+        992,
         -16
       ],
       "id": "c2656649-bdb0-46ba-a7c5-4caa248d8ef7",
       "name": "Success message",
       "webhookId": "ae00c229-cd47-443c-a635-b6bc2e8f6021",
+      "executeOnce": true,
       "credentials": {
         "discordWebhookApi": {
           "id": "W9zSrpG6HpmAVtJr",
           "name": "Discord Webhook account"
         }
       }
-    },
-    {
-      "parameters": {
-        "content": "# TO DO\n\n- Configure Discord messages"
-      },
-      "type": "n8n-nodes-base.stickyNote",
-      "position": [
-        992,
-        -240
-      ],
-      "typeVersion": 1,
-      "id": "404e3f12-7023-4639-9d2a-5b855ebcbeef",
-      "name": "Sticky Note2"
     }
   ],
   "pinData": {},
@@ -614,7 +617,7 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "71ac9b3f-2324-4769-9187-09ceb6beb1ff",
+  "versionId": "4f0b02ed-66d6-4c6c-b77d-0fc04a124892",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "2051c64e7f5229fb7f140fa9000974aa00a4812521b0f17e6f508cfe6dcd8200"
