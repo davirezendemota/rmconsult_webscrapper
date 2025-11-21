@@ -46,32 +46,39 @@ Estrutura lógica em camadas:
 
 ## 3. Estrutura de pastas (projeto base)
 
-Exemplo de estrutura sugerida:
+Estrutura atual do projeto:
 
 ```bash
-rmconsult_scrappers/
-├── Pipfile
-├── Pipfile.lock
-├── .env
-├── main.py
-├── app/
-│   ├── __init__.py
-│   ├── routers.py
-│   └── scrappers/
-│       ├── __init__.py
-│       └── scrapper_serapi/
-│           ├── __init__.py
-│           ├── serapi_controller.py
-│           ├── serapi_service.py
-│           ├── serapi_repository.py
-│           ├── serapi_scraper.py
-│           ├── scrapper_serapi_dto.py
-│           └── utils/
-│               ├── __init__.py
-│               ├── excel_formatter.py
-│               ├── credits.py
-│               └── constants.py
-└── resultados/
+rmconsult_webscrapper/
+├── api/
+│   ├── Pipfile
+│   ├── Pipfile.lock
+│   ├── Dockerfile
+│   ├── .dockerignore
+│   ├── main.py
+│   └── app/
+│       ├── core/
+│       │   ├── __init__.py
+│       │   ├── BaseRepositoy.py
+│       │   ├── config.py
+│       │   └── logger.py
+│       ├── routers.py
+│       └── scrappers/
+│           ├── scrapper_google_api/
+│           └── scrapper_serapi/
+│               ├── scrapper_serapi_dto.py
+│               ├── serapi_controller.py
+│               ├── serapi_repository.py
+│               ├── serapi_scraper.py
+│               ├── serapi_service.py
+│               └── utils/
+│                   ├── constants.py
+│                   ├── excel_formatter.py
+│                   └── mapper_serapi.py
+├── .github/
+│   └── workflows/
+│       └── docker.yml
+└── README.md
 ```
 
 - A pasta `scrapper_serapi` representa **uma família de scrapers** (SerpAPI Google Maps).
@@ -133,12 +140,13 @@ pip install pipenv
 
 ```bash
 git clone SEU_REPO_AQUI.git
-cd rmconsult_scrappers
+cd rmconsult_webscrapper
 ```
 
 ### 5.3. Instalar as dependências (via Pipenv)
 
 ```bash
+cd api
 pipenv install
 ```
 
@@ -161,7 +169,7 @@ pipenv shell
 
 ## 6. Variáveis de ambiente (.env)
 
-Na raiz do projeto, crie um arquivo **`.env`** com:
+Na pasta `api/`, crie um arquivo **`.env`** com:
 
 ```env
 SERPAPI_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -191,20 +199,22 @@ prod = "uvicorn main:app --host 0.0.0.0 --port 8000"
 ### 7.1. Rodar em ambiente de desenvolvimento
 
 ```bash
+cd api
 pipenv run dev
 ```
 
-- Sobe o FastAPI com **reload automático** na porta `8000`.
-- A API fica acessível em `http://127.0.0.1:8000`.
-- A documentação Swagger fica em `http://127.0.0.1:8000/docs`.
+- Sobe o FastAPI com **reload automático** na porta `8005`.
+- A API fica acessível em `http://127.0.0.1:8005`.
+- A documentação Swagger fica em `http://127.0.0.1:8005/docs`.
 
-### 7.2. Rodar em “modo produção” simples (local)
+### 7.2. Rodar em "modo produção" simples (local)
 
 ```bash
+cd api
 pipenv run prod
 ```
 
-- Sobe o servidor na porta `8000`, aceitando conexões externas (`0.0.0.0`).
+- Sobe o servidor na porta `8005`, aceitando conexões externas (`0.0.0.0`).
 - Ideal para subir em container ou máquina remota (até integrar com um nginx / proxy reverso).
 
 ---
@@ -276,13 +286,13 @@ pipenv run prod
 ### 9.1. Buscar resultados em JSON
 
 ```bash
-curl -X POST "http://127.0.0.1:8000/scrappers/serapi/buscar"   -H "Content-Type: application/json"   -d "{"termo": "barbearia recife"}"
+curl -X POST "http://127.0.0.1:8005/scrappers/serapi/buscar"   -H "Content-Type: application/json"   -d "{"termo": "barbearia recife"}"
 ```
 
 ### 9.2. Buscar e gerar Excel
 
 ```bash
-curl -X POST "http://127.0.0.1:8000/scrappers/serapi/buscar/excel"   -H "Content-Type: application/json"   -d "{"termo": "barbearia recife"}"
+curl -X POST "http://127.0.0.1:8005/scrappers/serapi/buscar/excel"   -H "Content-Type: application/json"   -d "{"termo": "barbearia recife"}"
 ```
 
 ---
@@ -316,16 +326,19 @@ O n8n poderá:
 ## 12. Resumo rápido de comandos
 
 ```bash
-# 1) Instalar dependências
+# 1) Entrar na pasta da API
+cd api
+
+# 2) Instalar dependências
 pipenv install
 
-# 2) (Opcional) Entrar no shell virtual
+# 3) (Opcional) Entrar no shell virtual
 pipenv shell
 
-# 3) Rodar API em modo desenvolvimento
+# 4) Rodar API em modo desenvolvimento
 pipenv run dev
 
-# 4) Rodar API em modo "produção" simples (local)
+# 5) Rodar API em modo "produção" simples (local)
 pipenv run prod
 ```
 
