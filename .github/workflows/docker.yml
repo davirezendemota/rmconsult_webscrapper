@@ -54,3 +54,89 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      - name: Notify Discord on successful deploy
+        if: success()
+        run: |
+          curl -H "Content-Type: application/json" \
+            -d '{
+              "embeds": [{
+                "title": "🚀 API Deploy Successful",
+                "description": "New Docker image built and pushed successfully!",
+                "color": 3066993,
+                "fields": [
+                  {
+                    "name": "Repository",
+                    "value": "${{ github.repository }}",
+                    "inline": true
+                  },
+                  {
+                    "name": "Branch",
+                    "value": "${{ github.ref_name }}",
+                    "inline": true
+                  },
+                  {
+                    "name": "Commit",
+                    "value": "[`${{ github.sha }}`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})",
+                    "inline": false
+                  },
+                  {
+                    "name": "Image",
+                    "value": "`${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest`",
+                    "inline": false
+                  },
+                  {
+                    "name": "Triggered by",
+                    "value": "${{ github.actor }}",
+                    "inline": true
+                  }
+                ],
+                "footer": {
+                  "text": "GitHub Actions"
+                }
+              }]
+            }' \
+            ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+      - name: Notify Discord on failed deploy
+        if: failure()
+        run: |
+          curl -H "Content-Type: application/json" \
+            -d '{
+              "embeds": [{
+                "title": "❌ API Deploy Failed",
+                "description": "Docker image build or push failed!",
+                "color": 15158332,
+                "fields": [
+                  {
+                    "name": "Repository",
+                    "value": "${{ github.repository }}",
+                    "inline": true
+                  },
+                  {
+                    "name": "Branch",
+                    "value": "${{ github.ref_name }}",
+                    "inline": true
+                  },
+                  {
+                    "name": "Commit",
+                    "value": "[`${{ github.sha }}`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})",
+                    "inline": false
+                  },
+                  {
+                    "name": "Workflow",
+                    "value": "[View Workflow](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})",
+                    "inline": false
+                  },
+                  {
+                    "name": "Triggered by",
+                    "value": "${{ github.actor }}",
+                    "inline": true
+                  }
+                ],
+                "footer": {
+                  "text": "GitHub Actions"
+                }
+              }]
+            }' \
+            ${{ secrets.DISCORD_WEBHOOK_URL }}
+
