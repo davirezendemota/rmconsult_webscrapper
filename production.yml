@@ -1,0 +1,25 @@
+services:
+# API
+  api:
+    container_name: rmconsult_webscrapper-api
+    image: ghcr.io/davirezendemota/rmconsult_webscrapper:latest
+    restart: unless-stopped
+    ports:
+      - "10102:8005"
+    environment:
+      - SERPAPI_KEY=${SERPAPI_KEY}
+# POSTGRES
+  postgres:
+    container_name: rmconsult_webscrapper-postgres
+    image: postgres:18
+    user: "1000"
+    restart: unless-stopped
+    ports:
+      - "10103:5432"
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    volumes:
+      - /workspace/volumes/rmconsult_webscrapper/postgres:/var/lib/postgresql
+
