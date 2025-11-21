@@ -3,27 +3,15 @@ from app.scrappers.scrapper_serapi.scrapper_serapi_dto import CompanyInfoDTO
 
 
 def map_serapi_to_company_info(item: dict) -> CompanyInfoDTO:
+    print(item)
+    print('')
     address = item.get("address", "")
-
-    # Dividir endereço (quando possível) — mapeamento inteligente
-    neighborhood = None
-    city = None
-    state = None
-    zip_code = None
 
     if address and "," in address:
         parts = [p.strip() for p in address.split(",")]
         if len(parts) >= 1:
             country = parts[-1]
-        if len(parts) >= 2:
-            neighborhood = parts[1]
-            zip_code = parts[-2]
-        if len(parts) >= 3:
-            city = parts[2].split("-")[0].strip()
-        if len(parts) >= 3 and "-" in parts[2]:
-            state = parts[2].split("-")[1].strip()
             
-
     dto = CompanyInfoDTO(
         # Basic
         name=item.get("title"),
@@ -33,12 +21,12 @@ def map_serapi_to_company_info(item: dict) -> CompanyInfoDTO:
 
         # Location
         address=address,
-        neighborhood=neighborhood,
-        city=city,
-        state=state,
+        neighborhood=None,
+        city=None,
+        state=None,
         region=None,
         country=country,
-        zip_code=zip_code,
+        zip_code=None,
 
         # Contact
         phone_number=item.get("phone"),
