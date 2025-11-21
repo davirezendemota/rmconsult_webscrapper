@@ -1,0 +1,624 @@
+{
+  "name": "companies_automatized_search",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1
+              ],
+              "triggerAtHour": 12
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "1ed5333b-f65b-4d6a-91ee-fbccfe03cd0b",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://72.60.144.82:10101/scraaper/serapi/buscar",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "termo",
+              "value": "={{ $json.city }} {{ $json.lob}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        400,
+        0
+      ],
+      "id": "12da57c9-e852-4a54-a490-c53c26d56c14",
+      "name": "HTTP Request",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "content": "Select the first city and line of business names that were not searched yet",
+        "height": 112,
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        176,
+        -128
+      ],
+      "typeVersion": 1,
+      "id": "9267137d-e9be-4f6a-b24e-683b30e40fba",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "Insert searched city and line of business IDs into searched_cities_lob",
+        "height": 96,
+        "width": 160
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        608,
+        -368
+      ],
+      "typeVersion": 1,
+      "id": "9399b6a6-5b4b-48d9-a4aa-643afa36d246",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "empresas",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        592,
+        -16
+      ],
+      "id": "6ae9e81f-836c-40e1-b920-d5ddfad1fbac",
+      "name": "Split Out",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "value": "public",
+          "mode": "list",
+          "cachedResultName": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "searched_cities_lobs",
+          "mode": "list",
+          "cachedResultName": "searched_cities_lobs"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "city_id": "={{ $('Unsearched city + line of business').item.json.city_id }}",
+            "lob_id": "={{ $('Unsearched city + line of business').item.json.lob_id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "city_id",
+              "displayName": "city_id",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "lob_id",
+              "displayName": "lob_id",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        640,
+        -256
+      ],
+      "id": "ed097014-0073-4cda-9d25-332e69e28f00",
+      "name": "Save searched city + line of business",
+      "credentials": {
+        "postgres": {
+          "id": "mTAPynejTwUkWWYj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "-- Select first city and line of business name that are not present in searched_cities_lobs\nSELECT c.id AS city_id, c.city, l.id AS lob_id, l.lob\nFROM cities c\nCROSS JOIN lines_of_business l\nWHERE NOT EXISTS (\n\tSELECT 1\n\tFROM searched_cities_lobs s\n\tWHERE s.city_id = c.id\n\tAND s.lob_id = l.id\n)\nORDER BY c.id, l.id\nLIMIT 1",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        208,
+        0
+      ],
+      "id": "f4fe9bec-fada-4b37-9ee1-d0f1d362d28a",
+      "name": "Unsearched city + line of business",
+      "credentials": {
+        "postgres": {
+          "id": "mTAPynejTwUkWWYj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "company_info",
+          "mode": "list",
+          "cachedResultName": "company_info"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "has_website": "={{ $json.has_website }}",
+            "review_count": "={{ $json.review_count }}",
+            "rating": "={{ $json.rating }}",
+            "name": "={{ $json.name }}",
+            "line_of_business": "={{ $json.line_of_business }}",
+            "maps_category": "={{ $json.maps_category }}",
+            "description": "={{ $json.description }}",
+            "adress": "={{ $json.address }}",
+            "neighboorhood": "={{ $json.neighborhood }}",
+            "city": "={{ $json.city }}",
+            "state": "={{ $json.state }}",
+            "region": "={{ $json.region }}",
+            "country": "={{ $json.country }}",
+            "zip_code": "={{ $json.zip_code }}",
+            "phone_number": "={{ $json.phone_number }}",
+            "email": "={{ $json.email }}",
+            "website": "={{ $json.website }}",
+            "url_google_maps": "={{ $json.url_google_maps }}",
+            "place_id": "={{ $json.place_id }}",
+            "business_hours": "={{ $json.business_hours }}",
+            "photos_url": "=null",
+            "price_range": "={{ $json.price_range }}",
+            "data_scraping": "={{ $json.data_scraping }}",
+            "source": "={{ $json.source }}",
+            "last_updated": "={{ $json.last_updated }}",
+            "id": 0
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "line_of_business",
+              "displayName": "line_of_business",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "maps_category",
+              "displayName": "maps_category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "description",
+              "displayName": "description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "adress",
+              "displayName": "adress",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "neighboorhood",
+              "displayName": "neighboorhood",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "city",
+              "displayName": "city",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "state",
+              "displayName": "state",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "region",
+              "displayName": "region",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "country",
+              "displayName": "country",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "zip_code",
+              "displayName": "zip_code",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "phone_number",
+              "displayName": "phone_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "website",
+              "displayName": "website",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "has_website",
+              "displayName": "has_website",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "url_google_maps",
+              "displayName": "url_google_maps",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "place_id",
+              "displayName": "place_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "review_count",
+              "displayName": "review_count",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "rating",
+              "displayName": "rating",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "business_hours",
+              "displayName": "business_hours",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "object",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "photos_url",
+              "displayName": "photos_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "object",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "price_range",
+              "displayName": "price_range",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "data_scraping",
+              "displayName": "data_scraping",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "source",
+              "displayName": "source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "last_updated",
+              "displayName": "last_updated",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        816,
+        -16
+      ],
+      "id": "cb6c6327-6070-482e-9886-c3ddbdb4ec47",
+      "name": "Insert company info",
+      "credentials": {
+        "postgres": {
+          "id": "mTAPynejTwUkWWYj",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "webhook",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        640,
+        208
+      ],
+      "id": "61a5ed1a-b154-4e5a-8b8b-8b85718f2e8b",
+      "name": "Error message",
+      "webhookId": "ae00c229-cd47-443c-a635-b6bc2e8f6021",
+      "credentials": {
+        "discordWebhookApi": {
+          "id": "W9zSrpG6HpmAVtJr",
+          "name": "Discord Webhook account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "webhook",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        1024,
+        -16
+      ],
+      "id": "c2656649-bdb0-46ba-a7c5-4caa248d8ef7",
+      "name": "Success message",
+      "webhookId": "ae00c229-cd47-443c-a635-b6bc2e8f6021",
+      "credentials": {
+        "discordWebhookApi": {
+          "id": "W9zSrpG6HpmAVtJr",
+          "name": "Discord Webhook account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# TO DO\n\n- Configure Discord messages"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        992,
+        -240
+      ],
+      "typeVersion": 1,
+      "id": "404e3f12-7023-4639-9d2a-5b855ebcbeef",
+      "name": "Sticky Note2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Unsearched city + line of business",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Save searched city + line of business",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Insert company info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save searched city + line of business": {
+      "main": [
+        []
+      ]
+    },
+    "Unsearched city + line of business": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert company info": {
+      "main": [
+        [
+          {
+            "node": "Success message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "71ac9b3f-2324-4769-9187-09ceb6beb1ff",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2051c64e7f5229fb7f140fa9000974aa00a4812521b0f17e6f508cfe6dcd8200"
+  },
+  "id": "hd5DoKwgukBlsQ4U",
+  "tags": []
+}
