@@ -2,7 +2,7 @@ from datetime import datetime
 
 from fastapi.responses import StreamingResponse
 from scrappers.scrapper_serapi.utils.mapper_serapi import map_serapi_to_company_info
-from scrappers.scrapper_serapi.utils.serapi_scraper import SerApiScraper
+from scrappers.scrapper_serapi.serapi_scraper import SerApiScraper
 from scrappers.scrapper_serapi.utils.excel_formatter import ExcelFormatter
 from scrappers.scrapper_serapi.repositories.serapi_repository import SerApiRepository
 

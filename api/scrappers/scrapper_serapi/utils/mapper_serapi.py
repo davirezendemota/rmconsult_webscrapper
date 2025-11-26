@@ -3,8 +3,8 @@ from scrappers.scrapper_serapi.dtos.scrapper_serapi_dto import CompanyInfoDTO
 
 
 def map_serapi_to_company_info(item: dict) -> CompanyInfoDTO:
-    print(item)
-    print('')
+    # print(item)
+    # print('')
     address = item.get("address", "")
 
     if address and "," in address:
