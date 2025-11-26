@@ -1,5 +1,5 @@
 from datetime import datetime
-from app.scrappers.scrapper_serapi.scrapper_serapi_dto import CompanyInfoDTO
+from scrappers.scrapper_serapi.dtos.scrapper_serapi_dto import CompanyInfoDTO
 
 
 def map_serapi_to_company_info(item: dict) -> CompanyInfoDTO:

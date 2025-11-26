@@ -17,6 +17,10 @@ certifi = "*"
 charset-normalizer = "*"
 idna = "*"
 urllib3 = "*"
+sqlalchemy = "*"
+sqlmodel = "*"
+alembic = "*"
+
 
 [dev-packages]
 pytest = "*"

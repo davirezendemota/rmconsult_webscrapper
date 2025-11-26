@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends
 from typing import Dict, Any
 from fastapi.responses import FileResponse
-from app.scrappers.scrapper_serapi.scrapper_serapi_dto import SerApiBuscarDTO
-from app.scrappers.scrapper_serapi.serapi_service import SerApiService
+from scrappers.scrapper_serapi.dtos.scrapper_serapi_dto import SerApiBuscarDTO
+from scrappers.scrapper_serapi.services.serapi_service import SerApiService
 
 serapi_router = APIRouter(tags=["SerAPI Google Maps"])
 

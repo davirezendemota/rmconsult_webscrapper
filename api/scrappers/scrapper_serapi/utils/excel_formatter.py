@@ -7,7 +7,7 @@ from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
 from openpyxl.worksheet.table import Table, TableStyleInfo
 
-from app.scrappers.scrapper_serapi.utils.constants import RENOMEAR_COLUNAS
+from scrappers.scrapper_serapi.utils.constants import RENOMEAR_COLUNAS
 
 
 class ExcelFormatter:

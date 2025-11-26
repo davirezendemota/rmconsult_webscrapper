@@ -1,6 +1,6 @@
 from serpapi import GoogleSearch
-from app.core.config import env
-from app.core.logger import serpapi_logger
+from core.config import env
+from core.logger import serpapi_logger
 
 
 class SerApiScraper:
